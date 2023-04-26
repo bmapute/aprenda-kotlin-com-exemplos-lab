@@ -1,21 +1,49 @@
-// [Template no Kotlin Playground](https://pl.kotl.in/WcteahpyN)
+enum class Nivel { BASICO, INTERMEDIARIO, AVANCADO }
 
-enum class Nivel { BASICO, INTERMEDIARIO, DIFICIL }
+data class Usuario(val nome:String, val email:String){
 
-class Usuario
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Usuario) return false
+        if (email != other.email) return false
+        return true
+    }
 
-data class ConteudoEducacional(var nome: String, val duracao: Int = 60)
-
-data class Formacao(val nome: String, var conteudos: List<ConteudoEducacional>) {
-
-    val inscritos = mutableListOf<Usuario>()
-    
-    fun matricular(usuario: Usuario) {
-        TODO("Utilize o parâmetro $usuario para simular uma matrícula (usar a lista de $inscritos).")
+    override fun hashCode(): Int {
+        return email.hashCode()
     }
 }
 
-fun main() {
-    TODO("Analise as classes modeladas para este domínio de aplicação e pense em formas de evoluí-las.")
-    TODO("Simule alguns cenários de teste. Para isso, crie alguns objetos usando as classes em questão.")
+data class ConteudoEducacional(var nome: String, val duracao: Int = 30)
+
+data class Formacao(val nome: String, val nivel: Nivel, var conteudos: List<ConteudoEducacional>) {
+
+   private val _inscritos = mutableListOf<Usuario>()
+    val inscritos: List<Usuario> get() = _inscritos
+
+    fun matricular(vararg usuarios: Usuario) {
+        // A ideia do forEach seria para aplicar as regras de negocio para cada aluno antes de adicionar a coleção
+        usuarios.forEach {
+            if (!_inscritos.contains(it)) _inscritos.add(it)
+        }
+    }
+
 }
+
+fun main() {
+
+    val conteudos=mutableListOf(
+        ConteudoEducacional("Conhecendo o Kotlin e Sua Documentação oficial"),
+        ConteudoEducacional("Introdução prática à Linguagem de Programação Kotlin",60),
+        ConteudoEducacional("Estruturas de Controle de Fluxo e Coleções em Kotlin",90)
+    )
+
+     Formacao("Dominando a Linguagem de Programação Kotlin", Nivel.INTERMEDIARIO, conteudos)
+        .apply {
+            matricular(
+                Usuario("bmapute", "email@test.com"),
+                Usuario("jCossa", "email@test.com"))
+        }.run {
+            println("Usuarios Inscritos na Formação : ${nome} ->  ${inscritos}")
+        }
+    }
